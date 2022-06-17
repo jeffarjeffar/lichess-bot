@@ -25,6 +25,7 @@ from urllib3.exceptions import ProtocolError
 from ColorLogger import enable_color_logging
 from collections import defaultdict
 from http.client import RemoteDisconnected
+import queue
 
 logger = logging.getLogger(__name__)
 
@@ -128,10 +129,10 @@ def start(li, user_profile, config, logging_level, log_filename, one_game=False)
     with logging_pool.LoggingPool(max_games + 1) as pool:
         while not terminated:
             try:
-                event = control_queue.get()
+                event = control_queue.get(timeout=69)
                 if event.get("type") != "ping":
                     logger.debug(f"Event: {event}")
-            except InterruptedError:
+            except (InterruptedError, queue.Empty):
                 continue
 
             if event.get("type") is None:
