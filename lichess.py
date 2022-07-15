@@ -92,8 +92,12 @@ class Lichess:
         return self.api_post(ENDPOINTS["abort"].format(game_id))
 
     def get_event_stream(self):
-        url = urljoin(self.baseUrl, ENDPOINTS["stream_event"])
-        return requests.get(url, headers=self.header, stream=True)
+        try:
+            url = urljoin(self.baseUrl, ENDPOINTS["stream_event"])
+            return requests.get(url, headers=self.header, stream=True)
+        except Exception as e:
+            logging.error(e)
+            return None
 
     def get_game_stream(self, game_id):
         url = urljoin(self.baseUrl, ENDPOINTS["stream"].format(game_id))

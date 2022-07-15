@@ -116,8 +116,6 @@ class Engine(ExampleEngine):
         self.move = 0
 
     def search(self, board, time_limit, ponder, draw_offered):
-        print(board, time_limit, ponder, draw_offered)
-
         os.makedirs('temp', exist_ok=True)
         file_in = os.path.join('temp', f'input-{self.move}.txt')
         file_out = os.path.join('temp', f'output-{self.move}.txt')
@@ -128,28 +126,25 @@ class Engine(ExampleEngine):
             time_control = time_limit.time * 1000
         except Exception:
             if board.turn == chess.WHITE:
-                time_control = max(int(time_limit.white_clock * 10) + \
-                    int(time_limit.white_inc) * 1000 - 300, 96)
+                time_control = max(int(time_limit.white_clock * 10) +
+                                   int(time_limit.white_inc) * 1000 - 300, 96)
             else:
-                time_control = max(int(time_limit.black_clock * 10) + \
-                    int(time_limit.black_inc) * 1000 - 300, 96)
+                time_control = max(int(time_limit.black_clock * 10) +
+                                   int(time_limit.black_inc) * 1000 - 300, 96)
 
-        f = open(file_in, 'w')
-        f.write(
-            f'setoption time_limit {time_control}\n'
-            'setoption table_size 69696983\n'
-            f'go {board.fen(en_passant="fen")}\nquit')
-        f.close()
+        with open(file_in, 'w') as f:
+            f.write(
+                f'setoption time_limit {time_control}\n'
+                'setoption table_size 69696983\n'
+                f'go {board.fen(en_passant="fen")}\nquit')
         os.system(f'~/bin/engine < {file_in} > {file_out}')
 
-        f = open(file_out)
-        out = f.readlines()
-        f.close()
-        move = None
-        for i in range(len(out) - 1, 0, -1):
-            if out[i].startswith('COMPUTER PLAYED'):
-                move = out[i][16:].strip()
-                break
+        with open(file_out) as f:
+            out = f.readlines()
+
+        move = next((out[i][16:].strip() for i in range(
+            len(out) - 1, 0, -1) if out[i].startswith('COMPUTER PLAYED')), None)
+
         if move == 'RESIGN':
             return PlayResult(None, None, resigned=True)
         try:
