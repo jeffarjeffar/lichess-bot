@@ -6,3 +6,5 @@ test_bot/__pycache__
 
 temp/
 game_records/
+
+venv/

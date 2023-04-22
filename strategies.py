@@ -137,7 +137,7 @@ class Engine(ExampleEngine):
                 f'setoption time_limit {time_control}\n'
                 'setoption table_size 69696983\n'
                 f'go {board.fen(en_passant="fen")}\nquit')
-        os.system(f'~/bin/engine < {file_in} > {file_out}')
+        os.system(f'~/bots/Chess_Bot/engine < {file_in} > {file_out}')
 
         with open(file_out) as f:
             out = f.readlines()
